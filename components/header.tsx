@@ -29,7 +29,7 @@ export function Header({ user }: HeaderProps) {
 
   const handleLogout = () => {
     localStorage.removeItem("user")
-    router.push("/auth/login")
+    router.push("/")
   }
 
   return (

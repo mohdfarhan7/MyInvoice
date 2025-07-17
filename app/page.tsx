@@ -185,17 +185,16 @@ export default function HomePage() {
                   <div className="absolute top-full left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-200 p-4 z-50">
                     <div className="grid gap-3">
                       {solutions.map((solution) => (
-                        <Link
+                        <div
                           key={solution.title}
-                          href={`/solutions/${solution.title.toLowerCase().replace(/\s+/g, "-")}`}
-                          className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                          className="flex items-start space-x-3 p-3 rounded-lg bg-gray-100 cursor-default select-none"
                         >
                           <solution.icon className={`w-5 h-5 mt-0.5 ${solution.color}`} />
                           <div>
                             <div className="font-medium text-gray-900">{solution.title}</div>
                             <div className="text-sm text-gray-600">{solution.description}</div>
                           </div>
-                        </Link>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -293,7 +292,7 @@ export default function HomePage() {
                 <Link href="/demo">
                   <Button size="lg" variant="outline" className="text-lg px-8 py-4 bg-transparent">
                     <Play className="w-5 h-5 mr-2" />
-                    Watch Demo
+                    Book a Demo
                   </Button>
                 </Link>
               </div>
