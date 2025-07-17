@@ -44,7 +44,7 @@ const quickActions = [
 
 export function QuickActions() {
   return (
-    <Card>
+    <Card className="shadow-md border-0 rounded-2xl bg-white">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Plus className="h-5 w-5" />
@@ -56,12 +56,12 @@ export function QuickActions() {
           {quickActions.map((action, index) => (
             <Button
               key={index}
-              variant="outline"
-              className="h-auto p-4 flex flex-col items-center gap-2 hover:shadow-md transition-all bg-transparent"
+              variant={index === 0 ? "default" : "outline"}
+              className={`h-auto p-4 flex flex-col items-center gap-2 hover:shadow-lg transition-all rounded-xl ${index === 0 ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white" : "bg-gray-50"}`}
               asChild
             >
-              <a href={action.href}>
-                <div className={`p-3 rounded-lg ${action.color}`}>
+              <a href={action.href} className="w-full flex flex-col items-center">
+                <div className={`p-3 rounded-lg ${action.color} mb-2`}>
                   <action.icon className="h-6 w-6 text-white" />
                 </div>
                 <div className="text-center">

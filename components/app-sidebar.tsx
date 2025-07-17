@@ -28,6 +28,9 @@ import {
   MessageSquare,
   CreditCard,
   HelpCircle,
+  Building2,
+  Star,
+  Calendar,
 } from "lucide-react"
 
 const menuItems = [
@@ -35,6 +38,20 @@ const menuItems = [
     title: "Dashboard",
     url: "/dashboard",
     icon: LayoutDashboard,
+  },
+  // CRM Section
+  {
+    title: "CRM",
+    url: "/crm",
+    icon: Users,
+    children: [
+      { title: "CRM Dashboard", url: "/crm", icon: LayoutDashboard },
+      { title: "Leads", url: "/crm/leads", icon: Users },
+      { title: "Contacts", url: "/crm/contacts", icon: Users },
+      { title: "Accounts", url: "/crm/accounts", icon: Building2 },
+      { title: "Opportunities", url: "/crm/opportunities", icon: Star },
+      { title: "Activities", url: "/crm/activities", icon: Calendar },
+    ],
   },
   {
     title: "Invoices",

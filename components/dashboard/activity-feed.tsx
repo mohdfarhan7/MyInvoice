@@ -44,7 +44,7 @@ const activities = [
 
 export function ActivityFeed() {
   return (
-    <Card>
+    <Card className="shadow-md border-0 rounded-2xl bg-white">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Activity className="h-5 w-5" />
@@ -53,7 +53,18 @@ export function ActivityFeed() {
       </CardHeader>
       <CardContent className="space-y-4">
         {activities.map((activity) => (
-          <div key={activity.id} className="flex items-start gap-3">
+          <div
+            key={activity.id}
+            className={`flex items-start gap-3 p-3 bg-gray-50 rounded-lg border-l-4 ${
+              activity.type === "invoice"
+                ? "border-blue-400"
+                : activity.type === "customer"
+                ? "border-green-400"
+                : activity.type === "product"
+                ? "border-purple-400"
+                : "border-green-400"
+            }`}
+          >
             <div className={`p-2 rounded-full bg-gray-100`}>
               <activity.icon className={`h-3 w-3 ${activity.color}`} />
             </div>
@@ -64,6 +75,9 @@ export function ActivityFeed() {
             </div>
           </div>
         ))}
+        <div className="pt-2 text-right">
+          <a href="#" className="text-xs text-blue-600 hover:underline font-medium">View All</a>
+        </div>
       </CardContent>
     </Card>
   )

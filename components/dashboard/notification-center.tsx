@@ -36,17 +36,26 @@ const notifications = [
 
 export function NotificationCenter() {
   return (
-    <Card>
+    <Card className="shadow-md border-0 rounded-2xl bg-white">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Bell className="h-5 w-5" />
           Notifications
-          <Badge className="bg-red-100 text-red-800 ml-auto">3</Badge>
+          <Badge className="bg-red-100 text-red-800 ml-auto px-2 py-0.5 text-xs font-semibold rounded-full">3</Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {notifications.map((notification) => (
-          <div key={notification.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+          <div
+            key={notification.id}
+            className={`flex items-start gap-3 p-3 bg-gray-50 rounded-lg border-l-4 ${
+              notification.type === "warning"
+                ? "border-yellow-400"
+                : notification.type === "info"
+                ? "border-blue-400"
+                : "border-green-400"
+            }`}
+          >
             <notification.icon className={`h-4 w-4 mt-0.5 ${notification.color}`} />
             <div className="flex-1 min-w-0">
               <div className="text-sm font-medium text-gray-900">{notification.title}</div>
@@ -55,6 +64,9 @@ export function NotificationCenter() {
             </div>
           </div>
         ))}
+        <div className="pt-2 text-right">
+          <a href="#" className="text-xs text-blue-600 hover:underline font-medium">View All</a>
+        </div>
       </CardContent>
     </Card>
   )
