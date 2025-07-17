@@ -27,13 +27,6 @@ const quickActions = [
     href: "/dashboard/products/new",
   },
   {
-    title: "GST Return",
-    description: "File GST returns",
-    icon: Receipt,
-    color: "bg-orange-600 hover:bg-orange-700",
-    href: "/dashboard/gst",
-  },
-  {
     title: "Send WhatsApp",
     description: "Send invoice via WhatsApp",
     icon: MessageSquare,

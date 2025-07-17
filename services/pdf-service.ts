@@ -17,7 +17,6 @@ export interface InvoicePDFData {
   businessInfo: {
     name: string
     address: string
-    gstin: string
     phone: string
     email: string
     logo?: string
@@ -25,7 +24,6 @@ export interface InvoicePDFData {
   customerInfo: {
     name: string
     address: string
-    gstin?: string
     phone?: string
     email?: string
   }
@@ -36,14 +34,9 @@ export interface InvoicePDFData {
     unit: string
     rate: number
     amount: number
-    gstRate: number
-    gstAmount: number
   }>
   totals: {
     subtotal: number
-    cgst: number
-    sgst: number
-    igst: number
     total: number
   }
   terms?: string
@@ -84,8 +77,6 @@ export async function generateInvoicePDF(data: InvoicePDFData): Promise<Blob> {
     yPosition += 5
   })
 
-  pdf.text(`GSTIN: ${data.businessInfo.gstin}`, 20, yPosition)
-  yPosition += 5
   pdf.text(`Phone: ${data.businessInfo.phone}`, 20, yPosition)
   yPosition += 5
   pdf.text(`Email: ${data.businessInfo.email}`, 20, yPosition)
@@ -118,11 +109,6 @@ export async function generateInvoicePDF(data: InvoicePDFData): Promise<Blob> {
     yPosition += 5
   })
 
-  if (data.customerInfo.gstin) {
-    pdf.text(`GSTIN: ${data.customerInfo.gstin}`, 20, yPosition)
-    yPosition += 5
-  }
-
   if (data.customerInfo.phone) {
     pdf.text(`Phone: ${data.customerInfo.phone}`, 20, yPosition)
     yPosition += 5
@@ -132,9 +118,9 @@ export async function generateInvoicePDF(data: InvoicePDFData): Promise<Blob> {
 
   // Items table
   const tableStartY = yPosition
-  const tableHeaders = ["Description", "HSN", "Qty", "Unit", "Rate", "Amount", "GST%", "GST Amt"]
-  const columnWidths = [50, 20, 15, 15, 20, 25, 15, 20]
-  const columnX = [20, 70, 90, 105, 120, 140, 165, 180]
+  const tableHeaders = ["Description", "HSN", "Qty", "Unit", "Rate", "Amount"]
+  const columnWidths = [50, 20, 15, 15, 20, 25]
+  const columnX = [20, 70, 90, 105, 120, 140]
 
   // Table header
   pdf.setFillColor(240, 240, 240)
@@ -163,8 +149,6 @@ export async function generateInvoicePDF(data: InvoicePDFData): Promise<Blob> {
       item.unit,
       formatCurrency(item.rate),
       formatCurrency(item.amount),
-      `${item.gstRate}%`,
-      formatCurrency(item.gstAmount),
     ]
 
     rowData.forEach((data, colIndex) => {
@@ -189,24 +173,6 @@ export async function generateInvoicePDF(data: InvoicePDFData): Promise<Blob> {
   pdf.text("Subtotal:", totalsX - 30, yPosition)
   pdf.text(formatCurrency(data.totals.subtotal), totalsX, yPosition)
   yPosition += 6
-
-  if (data.totals.cgst > 0) {
-    pdf.text("CGST:", totalsX - 30, yPosition)
-    pdf.text(formatCurrency(data.totals.cgst), totalsX, yPosition)
-    yPosition += 6
-  }
-
-  if (data.totals.sgst > 0) {
-    pdf.text("SGST:", totalsX - 30, yPosition)
-    pdf.text(formatCurrency(data.totals.sgst), totalsX, yPosition)
-    yPosition += 6
-  }
-
-  if (data.totals.igst > 0) {
-    pdf.text("IGST:", totalsX - 30, yPosition)
-    pdf.text(formatCurrency(data.totals.igst), totalsX, yPosition)
-    yPosition += 6
-  }
 
   // Total line
   pdf.setDrawColor(0, 0, 0)

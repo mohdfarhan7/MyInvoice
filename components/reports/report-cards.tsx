@@ -27,26 +27,6 @@ const reportData = {
       lastGenerated: "3 hours ago",
     },
   ],
-  gst: [
-    {
-      title: "GSTR-1 Report",
-      description: "Outward supplies report for GST filing",
-      icon: FileText,
-      lastGenerated: "1 hour ago",
-    },
-    {
-      title: "GSTR-3B Report",
-      description: "Monthly return summary",
-      icon: FileText,
-      lastGenerated: "2 days ago",
-    },
-    {
-      title: "GST Summary",
-      description: "Tax collected and paid summary",
-      icon: BarChart3,
-      lastGenerated: "5 hours ago",
-    },
-  ],
   inventory: [
     {
       title: "Stock Summary",

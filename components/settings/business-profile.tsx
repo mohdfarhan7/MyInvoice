@@ -21,10 +21,6 @@ export function BusinessProfile() {
               <Label htmlFor="businessName">Business Name *</Label>
               <Input id="businessName" defaultValue="MyInvoiceBook Solutions" />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="gstin">GSTIN</Label>
-              <Input id="gstin" defaultValue="22AAAAA0000A1Z5" />
-            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

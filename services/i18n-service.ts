@@ -87,16 +87,7 @@ const translations: Record<string, Record<string, string>> = {
     "common.error": "An error occurred",
     "common.success": "Operation completed successfully",
 
-    // GST
-    "gst.number": "GST Number",
-    "gst.rate": "GST Rate",
-    "gst.amount": "GST Amount",
-    "gst.cgst": "CGST",
-    "gst.sgst": "SGST",
-    "gst.igst": "IGST",
-    "gst.reports": "GST Reports",
-    "gst.gstr1": "GSTR-1",
-    "gst.gstr3b": "GSTR-3B",
+    // GST REMOVED
 
     // Currency
     "currency.inr": "₹",
@@ -166,16 +157,7 @@ const translations: Record<string, Record<string, string>> = {
     "common.error": "एक त्रुटि हुई",
     "common.success": "ऑपरेशन सफलतापूर्वक पूरा हुआ",
 
-    // GST
-    "gst.number": "जीएसटी संख्या",
-    "gst.rate": "जीएसटी दर",
-    "gst.amount": "जीएसटी राशि",
-    "gst.cgst": "सीजीएसटी",
-    "gst.sgst": "एसजीएसटी",
-    "gst.igst": "आईजीएसटी",
-    "gst.reports": "जीएसटी रिपोर्ट",
-    "gst.gstr1": "जीएसटीआर-1",
-    "gst.gstr3b": "जीएसटीआर-3बी",
+    // GST REMOVED
 
     // Currency
     "currency.inr": "₹",

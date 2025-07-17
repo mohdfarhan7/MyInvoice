@@ -27,7 +27,7 @@ import {
 const solutions = [
   {
     title: "Smart Invoicing",
-    description: "GST-compliant invoices in seconds",
+    description: "Create invoices in seconds",
     icon: FileText,
     color: "text-blue-600",
   },
@@ -36,12 +36,6 @@ const solutions = [
     description: "Real-time stock management",
     icon: Package,
     color: "text-green-600",
-  },
-  {
-    title: "GST & Compliance",
-    description: "Automated tax calculations",
-    icon: Receipt,
-    color: "text-purple-600",
   },
   {
     title: "Business Analytics",
@@ -53,10 +47,10 @@ const solutions = [
 
 const features = [
   {
-    title: "GST Billing & Invoicing",
-    description: "Create professional GST invoices instantly",
+    title: "Billing & Invoicing",
+    description: "Create professional invoices instantly",
     icon: FileText,
-    items: ["GST Invoice", "Quotation", "Delivery Challan", "Purchase Order"],
+    items: ["Invoice", "Quotation", "Delivery Challan", "Purchase Order"],
   },
   {
     title: "Inventory Management",
@@ -74,7 +68,7 @@ const features = [
     title: "Reports & Analytics",
     description: "Get insights into your business",
     icon: BarChart3,
-    items: ["Sales Reports", "GST Reports", "Profit Analysis", "Tax Reports"],
+    items: ["Sales Reports", "Profit Analysis", "Tax Reports"],
   },
 ]
 

@@ -13,17 +13,13 @@ export default function ReportsPage() {
       </div>
       <ReportFilters />
       <Tabs defaultValue="sales" className="space-y-8">
-        <TabsList className="grid w-full grid-cols-4 gap-2">
+        <TabsList className="grid w-full grid-cols-3 gap-2">
           <TabsTrigger value="sales">Sales Reports</TabsTrigger>
-          <TabsTrigger value="gst">GST Reports</TabsTrigger>
           <TabsTrigger value="inventory">Inventory</TabsTrigger>
           <TabsTrigger value="financial">Financial</TabsTrigger>
         </TabsList>
         <TabsContent value="sales" className="space-y-8">
           <ReportCards type="sales" />
-        </TabsContent>
-        <TabsContent value="gst" className="space-y-8">
-          <ReportCards type="gst" />
         </TabsContent>
         <TabsContent value="inventory" className="space-y-8">
           <ReportCards type="inventory" />

@@ -24,7 +24,6 @@ export default function DashboardPage() {
           <CategoryChart />
         </div>
         <div className="space-y-8">
-          <GSTWidget />
           <NotificationCenter />
           <ActivityFeed />
         </div>

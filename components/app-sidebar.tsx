@@ -57,11 +57,6 @@ const menuItems = [
     icon: BarChart3,
   },
   {
-    title: "GST Filing",
-    url: "/dashboard/gst",
-    icon: Receipt,
-  },
-  {
     title: "E-Way Bills",
     url: "/dashboard/eway",
     icon: Truck,

@@ -43,29 +43,9 @@ export function InvoiceSettings() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="taxLabel">Tax Label</Label>
-              <Input id="taxLabel" defaultValue="GST" />
-            </div>
           </div>
 
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Show GST on Invoice</Label>
-                <p className="text-sm text-muted-foreground">Display GST breakdown on invoices</p>
-              </div>
-              <Switch defaultChecked />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Auto Calculate Tax</Label>
-                <p className="text-sm text-muted-foreground">Automatically calculate tax amounts</p>
-              </div>
-              <Switch defaultChecked />
-            </div>
-
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label>Round Off Amounts</Label>
