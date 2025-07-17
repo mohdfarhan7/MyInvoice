@@ -97,6 +97,138 @@ export default function LoginPage() {
           <p className="text-gray-500 text-sm">Welcome back! Please enter your credentials.</p>
         </div>
         {/* Login form goes here */}
+        <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold text-center">Welcome Back</CardTitle>
+            <CardDescription className="text-center">Sign in to your account to continue</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {error && (
+              <Alert className="mb-4 border-red-200 bg-red-50">
+                <AlertCircle className="h-4 w-4 text-red-600" />
+                <AlertDescription className="text-red-800">{error}</AlertDescription>
+              </Alert>
+            )}
+            <Tabs value={loginType} onValueChange={(value) => setLoginType(value as "email" | "mobile")}> 
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="email" className="flex items-center gap-2">
+                  <Mail className="w-4 h-4" /> Email
+                </TabsTrigger>
+                <TabsTrigger value="mobile" className="flex items-center gap-2">
+                  <Phone className="w-4 h-4" /> Mobile
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="email">
+                <form onSubmit={handleEmailLogin} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email Address</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="Enter your email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="h-11"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter your password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="h-11 pr-10"
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4 text-gray-400" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-gray-400" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-full h-11 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                    disabled={loading}
+                  >
+                    {loading ? "Signing In..." : "Sign In"}
+                  </Button>
+                </form>
+              </TabsContent>
+              <TabsContent value="mobile">
+                <form onSubmit={handleMobileLogin} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="mobile">Mobile Number</Label>
+                    <Input
+                      id="mobile"
+                      type="tel"
+                      placeholder="Enter your mobile number"
+                      value={mobile}
+                      onChange={(e) => setMobile(e.target.value)}
+                      className="h-11"
+                      required
+                      disabled={otpSent}
+                    />
+                  </div>
+                  {otpSent && (
+                    <div className="space-y-2">
+                      <Label htmlFor="otp">Enter OTP</Label>
+                      <Input
+                        id="otp"
+                        type="text"
+                        placeholder="Enter 6-digit OTP"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        className="h-11"
+                        maxLength={6}
+                        required
+                      />
+                      <p className="text-sm text-gray-600">Use OTP: 123456 for demo</p>
+                    </div>
+                  )}
+                  <Button
+                    type="submit"
+                    className="w-full h-11 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                    disabled={loading}
+                  >
+                    {loading ? "Processing..." : otpSent ? "Verify OTP" : "Send OTP"}
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
+            <div className="text-center mt-4">
+              <Link href="/auth/forgot-password" className="text-sm text-blue-600 hover:underline">
+                Forgot your password?
+              </Link>
+            </div>
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+              <p className="text-sm text-blue-800 font-medium">Demo Credentials:</p>
+              <p className="text-sm text-blue-700">Email: admin@gmail.com</p>
+              <p className="text-sm text-blue-700">Password: admin@123</p>
+            </div>
+          </CardContent>
+          <div className="px-6 pb-6">
+            <div className="text-center text-sm text-gray-600">
+              Don't have an account?{" "}
+              <Link href="/auth/signup" className="text-blue-600 hover:underline font-medium">
+                Sign up
+              </Link>
+            </div>
+          </div>
+        </Card>
       </div>
     </div>
   )
