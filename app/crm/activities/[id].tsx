@@ -1,10 +1,11 @@
 "use client"
 
 import { useRouter, useSearchParams } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useRef } from "react"
+import { CustomField } from "@/components/ui/custom-layout-builder"
 
 const mockActivity = {
   id: 1,
@@ -19,12 +20,31 @@ const mockActivity = {
   attachments: [
     { id: 1, type: "attachment", filename: "call-recording.mp3", date: "2024-06-04" },
   ],
+  reminder: "",
+  custom: {} as Record<string, any>,
 }
 
 export default function ActivityDetailPage() {
   const router = useRouter()
   const params = useSearchParams()
-  const [activity, setActivity] = useState(mockActivity)
+  const [customFields, setCustomFields] = useState<CustomField[]>([])
+  const [activity, setActivity] = useState<typeof mockActivity | null>(null)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("activities_custom_fields")
+      setCustomFields(saved ? JSON.parse(saved) : [])
+      // Load activity by ID
+      const id = params.get("id") || window.location.pathname.split("/").pop()
+      const stored = localStorage.getItem("activities")
+      if (stored && id) {
+        const arr = JSON.parse(stored)
+        const found = arr.find((a: any) => String(a.id) === String(id))
+        setActivity(found || { ...mockActivity, id: Number(id) })
+      } else {
+        setActivity({ ...mockActivity, id: id ? Number(id) : 0 })
+      }
+    }
+  }, [params])
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
   const [note, setNote] = useState("")
@@ -34,9 +54,9 @@ export default function ActivityDetailPage() {
     e.preventDefault()
     if (!note.trim()) return
     setActivity({
-      ...activity,
+      ...activity!,
       notes: [
-        ...activity.notes,
+        ...activity!.notes,
         { id: Date.now(), type: "note", text: note, date: new Date().toISOString().slice(0, 10) },
       ],
     })
@@ -47,17 +67,21 @@ export default function ActivityDetailPage() {
     const file = e.target.files?.[0]
     if (!file) return
     setActivity({
-      ...activity,
+      ...activity!,
       attachments: [
-        ...activity.attachments,
+        ...activity!.attachments,
         { id: Date.now(), type: "attachment", filename: file.name, date: new Date().toISOString().slice(0, 10) },
       ],
     })
     if (fileInputRef.current) fileInputRef.current.value = ""
   }
 
+  const handleCustomChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setActivity({ ...activity!, custom: { ...activity!.custom, [e.target.name]: e.target.value } })
+  }
+
   // Merge notes and attachments for timeline
-  const timeline = [...activity.notes, ...activity.attachments].sort((a, b) => (a.date < b.date ? 1 : -1))
+  const timeline = [...activity!.notes, ...activity!.attachments].sort((a, b) => (a.date < b.date ? 1 : -1))
 
   if (deleted) {
     return (
@@ -67,6 +91,8 @@ export default function ActivityDetailPage() {
       </div>
     )
   }
+
+  if (!activity) return <div className="p-6">Loading...</div>;
 
   return (
     <div className="p-6 max-w-2xl mx-auto w-full">
@@ -83,21 +109,76 @@ export default function ActivityDetailPage() {
             <form className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1">Type</label>
-                <input className="input input-bordered w-full" defaultValue={activity.type} />
+                <input className="input input-bordered w-full" value={activity.type} onChange={e => setActivity({ ...activity, type: e.target.value })} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Subject</label>
-                <input className="input input-bordered w-full" defaultValue={activity.subject} />
+                <input className="input input-bordered w-full" value={activity.subject} onChange={e => setActivity({ ...activity, subject: e.target.value })} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Due Date</label>
-                <input className="input input-bordered w-full" defaultValue={activity.due} />
+                <input className="input input-bordered w-full" value={activity.due} onChange={e => setActivity({ ...activity, due: e.target.value })} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Owner</label>
-                <input className="input input-bordered w-full" defaultValue={activity.owner} />
+                <input className="input input-bordered w-full" value={activity.owner} onChange={e => setActivity({ ...activity, owner: e.target.value })} />
               </div>
-              <Button type="submit">Save</Button>
+              <div>
+                <label className="block text-sm font-medium mb-1">Reminder</label>
+                <input
+                  name="reminder"
+                  type="datetime-local"
+                  value={activity.reminder}
+                  onChange={e => setActivity({ ...activity, reminder: e.target.value })}
+                  className="w-full border rounded-md px-3 py-2"
+                />
+              </div>
+              {/* Render custom fields */}
+              {customFields.map(field => (
+                <div key={field.id}>
+                  <label className="block text-sm font-medium mb-1">{field.label}</label>
+                  {field.type === "text" && (
+                    <input
+                      name={field.id}
+                      value={(activity.custom as Record<string, any>)[field.id] || ""}
+                      onChange={handleCustomChange}
+                      className="w-full border rounded-md px-3 py-2"
+                    />
+                  )}
+                  {field.type === "number" && (
+                    <input
+                      type="number"
+                      name={field.id}
+                      value={(activity.custom as Record<string, any>)[field.id] || ""}
+                      onChange={handleCustomChange}
+                      className="w-full border rounded-md px-3 py-2"
+                    />
+                  )}
+                  {field.type === "date" && (
+                    <input
+                      type="date"
+                      name={field.id}
+                      value={(activity.custom as Record<string, any>)[field.id] || ""}
+                      onChange={handleCustomChange}
+                      className="w-full border rounded-md px-3 py-2"
+                    />
+                  )}
+                  {field.type === "select" && (
+                    <select
+                      name={field.id}
+                      value={(activity.custom as Record<string, any>)[field.id] || ""}
+                      onChange={handleCustomChange}
+                      className="w-full border rounded-md px-3 py-2"
+                    >
+                      <option value="">Select...</option>
+                      {(field.options || []).map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              ))}
+              <Button type="button" onClick={() => setEditing(false)}>Save</Button>
             </form>
           ) : (
             <div className="space-y-2">
@@ -105,6 +186,11 @@ export default function ActivityDetailPage() {
               <div><span className="font-medium">Subject:</span> {activity.subject}</div>
               <div><span className="font-medium">Due Date:</span> {activity.due}</div>
               <div><span className="font-medium">Owner:</span> {activity.owner}</div>
+              <div><span className="font-medium">Reminder:</span> {activity.reminder ? new Date(activity.reminder).toLocaleString() : ""}</div>
+              {/* Show custom fields */}
+              {customFields.map(field => (
+                <div key={field.id}><span className="font-medium">{field.label}:</span> {(activity.custom as Record<string, any>)[field.id] || ""}</div>
+              ))}
             </div>
           )}
 

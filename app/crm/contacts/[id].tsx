@@ -1,10 +1,11 @@
 "use client"
 
 import { useRouter, useSearchParams } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useRef } from "react"
+import { CustomField } from "@/components/ui/custom-layout-builder"
 
 const mockContact = {
   id: 1,
@@ -20,12 +21,20 @@ const mockContact = {
   attachments: [
     { id: 1, type: "attachment", filename: "contract.pdf", date: "2024-06-04" },
   ],
+  custom: {} as Record<string, any>,
 }
 
 export default function ContactDetailPage() {
   const router = useRouter()
   const params = useSearchParams()
-  const [contact, setContact] = useState(mockContact)
+  const [customFields, setCustomFields] = useState<CustomField[]>([])
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("contacts_custom_fields")
+      setCustomFields(saved ? JSON.parse(saved) : [])
+    }
+  }, [])
+  const [contact, setContact] = useState({ ...mockContact, custom: mockContact.custom || ({} as Record<string, any>) })
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
   const [note, setNote] = useState("")
@@ -57,6 +66,10 @@ export default function ContactDetailPage() {
     if (fileInputRef.current) fileInputRef.current.value = ""
   }
 
+  const handleCustomChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setContact({ ...contact, custom: { ...contact.custom, [e.target.name]: e.target.value } })
+  }
+
   // Merge notes and attachments for timeline
   const timeline = [...contact.notes, ...contact.attachments].sort((a, b) => (a.date < b.date ? 1 : -1))
 
@@ -84,25 +97,70 @@ export default function ContactDetailPage() {
             <form className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1">Name</label>
-                <input className="input input-bordered w-full" defaultValue={contact.name} />
+                <input className="input input-bordered w-full" value={contact.name} onChange={e => setContact({ ...contact, name: e.target.value })} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Email</label>
-                <input className="input input-bordered w-full" defaultValue={contact.email} />
+                <input className="input input-bordered w-full" value={contact.email} onChange={e => setContact({ ...contact, email: e.target.value })} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Phone</label>
-                <input className="input input-bordered w-full" defaultValue={contact.phone} />
+                <input className="input input-bordered w-full" value={contact.phone} onChange={e => setContact({ ...contact, phone: e.target.value })} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Company</label>
-                <input className="input input-bordered w-full" defaultValue={contact.company} />
+                <input className="input input-bordered w-full" value={contact.company} onChange={e => setContact({ ...contact, company: e.target.value })} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Owner</label>
-                <input className="input input-bordered w-full" defaultValue={contact.owner} />
+                <input className="input input-bordered w-full" value={contact.owner} onChange={e => setContact({ ...contact, owner: e.target.value })} />
               </div>
-              <Button type="submit">Save</Button>
+              {/* Render custom fields */}
+              {customFields.map(field => (
+                <div key={field.id}>
+                  <label className="block text-sm font-medium mb-1">{field.label}</label>
+                  {field.type === "text" && (
+                    <input
+                      name={field.id}
+                      value={(contact.custom as Record<string, any>)[field.id] || ""}
+                      onChange={handleCustomChange}
+                      className="w-full border rounded-md px-3 py-2"
+                    />
+                  )}
+                  {field.type === "number" && (
+                    <input
+                      type="number"
+                      name={field.id}
+                      value={(contact.custom as Record<string, any>)[field.id] || ""}
+                      onChange={handleCustomChange}
+                      className="w-full border rounded-md px-3 py-2"
+                    />
+                  )}
+                  {field.type === "date" && (
+                    <input
+                      type="date"
+                      name={field.id}
+                      value={(contact.custom as Record<string, any>)[field.id] || ""}
+                      onChange={handleCustomChange}
+                      className="w-full border rounded-md px-3 py-2"
+                    />
+                  )}
+                  {field.type === "select" && (
+                    <select
+                      name={field.id}
+                      value={(contact.custom as Record<string, any>)[field.id] || ""}
+                      onChange={handleCustomChange}
+                      className="w-full border rounded-md px-3 py-2"
+                    >
+                      <option value="">Select...</option>
+                      {(field.options || []).map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              ))}
+              <Button type="button" onClick={() => setEditing(false)}>Save</Button>
             </form>
           ) : (
             <div className="space-y-2">
@@ -111,6 +169,10 @@ export default function ContactDetailPage() {
               <div><span className="font-medium">Phone:</span> {contact.phone}</div>
               <div><span className="font-medium">Company:</span> {contact.company}</div>
               <div><span className="font-medium">Owner:</span> {contact.owner}</div>
+              {/* Show custom fields */}
+              {customFields.map(field => (
+                <div key={field.id}><span className="font-medium">{field.label}:</span> {(contact.custom as Record<string, any>)[field.id] || ""}</div>
+              ))}
             </div>
           )}
 

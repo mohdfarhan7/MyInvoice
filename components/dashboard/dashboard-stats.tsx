@@ -51,7 +51,7 @@ export function DashboardStats() {
               <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 group-hover:bg-gray-100 transition">
                 <stat.icon className={`h-5 w-5 ${stat.color}`} />
               </span>
-              <CardTitle className="text-sm font-medium text-gray-600">{stat.title}</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">{stat.title}</CardTitle>
             </div>
             <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${stat.trend === "up" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
               {stat.trend === "up" ? "+" : "-"}

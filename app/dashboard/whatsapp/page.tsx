@@ -46,13 +46,34 @@ export default function WhatsAppPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Helper to open WhatsApp Web with pre-filled message
+  const openWhatsApp = (phone: string, message: string) => {
+    // Remove non-digit characters for WhatsApp link
+    const phoneDigits = phone.replace(/\D/g, "");
+    const url = `https://wa.me/${phoneDigits}?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank");
+  };
+
+  // Helper to open WhatsApp Web with pre-filled message and update status
+  const openWhatsAppAndMarkSent = (msgId: number, phone: string, message: string) => {
+    const phoneDigits = phone.replace(/\D/g, "");
+    const url = `https://wa.me/${phoneDigits}?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank");
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.id === msgId ? { ...m, status: "Sent", date: new Date().toLocaleString("en-IN", { hour12: false }) } : m
+      )
+    );
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSending(true);
     setTimeout(() => {
+      const newId = messages.length + 1;
       setMessages([
         {
-          id: messages.length + 1,
+          id: newId,
           customer: form.customer,
           phone: form.phone,
           invoice: form.invoice,
@@ -65,6 +86,10 @@ export default function WhatsAppPage() {
       setForm({ customer: "", phone: "", invoice: "", template: templates[0] });
       setIsSending(false);
       setOpen(false);
+      // Open WhatsApp Web and mark as sent
+      setTimeout(() => {
+        openWhatsAppAndMarkSent(newId, form.phone, `${form.template} for invoice ${form.invoice}`);
+      }, 100); // slight delay to ensure state update
     }, 1200);
   };
 
@@ -175,7 +200,12 @@ export default function WhatsAppPage() {
                 </td>
                 <td className="px-4 py-2 text-sm">{msg.date}</td>
                 <td className="px-4 py-2">
-                  <Button size="icon" variant="ghost" title="Resend">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    title="Send WhatsApp"
+                    onClick={() => openWhatsAppAndMarkSent(msg.id, msg.phone, `${msg.template} for invoice ${msg.invoice}`)}
+                  >
                     <Send className="w-4 h-4" />
                   </Button>
                 </td>

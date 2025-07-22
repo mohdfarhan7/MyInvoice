@@ -1,9 +1,10 @@
 "use client"
 
 import { useRouter, useSearchParams } from "next/navigation"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { CustomField } from "@/components/ui/custom-layout-builder"
 
 const mockLead = {
   id: 1,
@@ -21,12 +22,20 @@ const mockLead = {
   attachments: [
     { id: 1, type: "attachment", filename: "brochure.pdf", date: "2024-06-03" },
   ],
+  custom: {} as Record<string, any>,
 }
 
 export default function LeadDetailPage() {
   const router = useRouter()
   const params = useSearchParams()
-  const [lead, setLead] = useState(mockLead)
+  const [customFields, setCustomFields] = useState<CustomField[]>([])
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("leads_custom_fields")
+      setCustomFields(saved ? JSON.parse(saved) : [])
+    }
+  }, [])
+  const [lead, setLead] = useState({ ...mockLead, custom: mockLead.custom || ({} as Record<string, any>) })
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
   const [note, setNote] = useState("")
@@ -58,6 +67,10 @@ export default function LeadDetailPage() {
     if (fileInputRef.current) fileInputRef.current.value = ""
   }
 
+  const handleCustomChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setLead({ ...lead, custom: { ...lead.custom, [e.target.name]: e.target.value } })
+  }
+
   // Merge notes and attachments for timeline
   const timeline = [...lead.notes, ...lead.attachments].sort((a, b) => (a.date < b.date ? 1 : -1))
 
@@ -85,33 +98,78 @@ export default function LeadDetailPage() {
             <form className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1">Name</label>
-                <input className="input input-bordered w-full" defaultValue={lead.name} />
+                <input className="input input-bordered w-full" value={lead.name} onChange={e => setLead({ ...lead, name: e.target.value })} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Company</label>
-                <input className="input input-bordered w-full" defaultValue={lead.company} />
+                <input className="input input-bordered w-full" value={lead.company} onChange={e => setLead({ ...lead, company: e.target.value })} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Status</label>
-                <input className="input input-bordered w-full" defaultValue={lead.status} />
+                <input className="input input-bordered w-full" value={lead.status} onChange={e => setLead({ ...lead, status: e.target.value })} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Stage</label>
-                <input className="input input-bordered w-full" defaultValue={lead.stage} />
+                <input className="input input-bordered w-full" value={lead.stage} onChange={e => setLead({ ...lead, stage: e.target.value })} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Owner</label>
-                <input className="input input-bordered w-full" defaultValue={lead.owner} />
+                <input className="input input-bordered w-full" value={lead.owner} onChange={e => setLead({ ...lead, owner: e.target.value })} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Email</label>
-                <input className="input input-bordered w-full" defaultValue={lead.email} />
+                <input className="input input-bordered w-full" value={lead.email} onChange={e => setLead({ ...lead, email: e.target.value })} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Phone</label>
-                <input className="input input-bordered w-full" defaultValue={lead.phone} />
+                <input className="input input-bordered w-full" value={lead.phone} onChange={e => setLead({ ...lead, phone: e.target.value })} />
               </div>
-              <Button type="submit">Save</Button>
+              {/* Render custom fields */}
+              {customFields.map(field => (
+                <div key={field.id}>
+                  <label className="block text-sm font-medium mb-1">{field.label}</label>
+                  {field.type === "text" && (
+                    <input
+                      name={field.id}
+                      value={(lead.custom as Record<string, any>)[field.id] || ""}
+                      onChange={handleCustomChange}
+                      className="w-full border rounded-md px-3 py-2"
+                    />
+                  )}
+                  {field.type === "number" && (
+                    <input
+                      type="number"
+                      name={field.id}
+                      value={(lead.custom as Record<string, any>)[field.id] || ""}
+                      onChange={handleCustomChange}
+                      className="w-full border rounded-md px-3 py-2"
+                    />
+                  )}
+                  {field.type === "date" && (
+                    <input
+                      type="date"
+                      name={field.id}
+                      value={(lead.custom as Record<string, any>)[field.id] || ""}
+                      onChange={handleCustomChange}
+                      className="w-full border rounded-md px-3 py-2"
+                    />
+                  )}
+                  {field.type === "select" && (
+                    <select
+                      name={field.id}
+                      value={(lead.custom as Record<string, any>)[field.id] || ""}
+                      onChange={handleCustomChange}
+                      className="w-full border rounded-md px-3 py-2"
+                    >
+                      <option value="">Select...</option>
+                      {(field.options || []).map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              ))}
+              <Button type="button" onClick={() => setEditing(false)}>Save</Button>
             </form>
           ) : (
             <div className="space-y-2">
@@ -122,6 +180,10 @@ export default function LeadDetailPage() {
               <div><span className="font-medium">Owner:</span> {lead.owner}</div>
               <div><span className="font-medium">Email:</span> {lead.email}</div>
               <div><span className="font-medium">Phone:</span> {lead.phone}</div>
+              {/* Show custom fields */}
+              {customFields.map(field => (
+                <div key={field.id}><span className="font-medium">{field.label}:</span> {(lead.custom as Record<string, any>)[field.id] || ""}</div>
+              ))}
             </div>
           )}
 

@@ -1,10 +1,11 @@
 "use client"
 
 import { useRouter, useSearchParams } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useRef } from "react"
+import { CustomField } from "@/components/ui/custom-layout-builder"
 
 const mockOpportunity = {
   id: 1,
@@ -19,12 +20,20 @@ const mockOpportunity = {
   attachments: [
     { id: 1, type: "attachment", filename: "proposal.pdf", date: "2024-06-04" },
   ],
+  custom: {} as Record<string, any>,
 }
 
 export default function OpportunityDetailPage() {
   const router = useRouter()
   const params = useSearchParams()
-  const [opportunity, setOpportunity] = useState(mockOpportunity)
+  const [customFields, setCustomFields] = useState<CustomField[]>([])
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("opportunities_custom_fields")
+      setCustomFields(saved ? JSON.parse(saved) : [])
+    }
+  }, [])
+  const [opportunity, setOpportunity] = useState({ ...mockOpportunity, value: String(mockOpportunity.value), custom: mockOpportunity.custom || ({} as Record<string, any>) })
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
   const [note, setNote] = useState("")
@@ -56,6 +65,10 @@ export default function OpportunityDetailPage() {
     if (fileInputRef.current) fileInputRef.current.value = ""
   }
 
+  const handleCustomChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setOpportunity({ ...opportunity, custom: { ...opportunity.custom, [e.target.name]: e.target.value } })
+  }
+
   // Merge notes and attachments for timeline
   const timeline = [...opportunity.notes, ...opportunity.attachments].sort((a, b) => (a.date < b.date ? 1 : -1))
 
@@ -83,28 +96,77 @@ export default function OpportunityDetailPage() {
             <form className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1">Name</label>
-                <input className="input input-bordered w-full" defaultValue={opportunity.name} />
+                <input className="input input-bordered w-full" value={opportunity.name} onChange={e => setOpportunity({ ...opportunity, name: e.target.value })} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Stage</label>
-                <input className="input input-bordered w-full" defaultValue={opportunity.stage} />
+                <input className="input input-bordered w-full" value={opportunity.stage} onChange={e => setOpportunity({ ...opportunity, stage: e.target.value })} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Value</label>
-                <input className="input input-bordered w-full" defaultValue={opportunity.value} />
+                <input className="input input-bordered w-full" value={opportunity.value} onChange={e => setOpportunity({ ...opportunity, value: e.target.value })} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Owner</label>
-                <input className="input input-bordered w-full" defaultValue={opportunity.owner} />
+                <input className="input input-bordered w-full" value={opportunity.owner} onChange={e => setOpportunity({ ...opportunity, owner: e.target.value })} />
               </div>
-              <Button type="submit">Save</Button>
+              {/* Render custom fields */}
+              {customFields.map(field => (
+                <div key={field.id}>
+                  <label className="block text-sm font-medium mb-1">{field.label}</label>
+                  {field.type === "text" && (
+                    <input
+                      name={field.id}
+                      value={(opportunity.custom as Record<string, any>)[field.id] || ""}
+                      onChange={handleCustomChange}
+                      className="w-full border rounded-md px-3 py-2"
+                    />
+                  )}
+                  {field.type === "number" && (
+                    <input
+                      type="number"
+                      name={field.id}
+                      value={(opportunity.custom as Record<string, any>)[field.id] || ""}
+                      onChange={handleCustomChange}
+                      className="w-full border rounded-md px-3 py-2"
+                    />
+                  )}
+                  {field.type === "date" && (
+                    <input
+                      type="date"
+                      name={field.id}
+                      value={(opportunity.custom as Record<string, any>)[field.id] || ""}
+                      onChange={handleCustomChange}
+                      className="w-full border rounded-md px-3 py-2"
+                    />
+                  )}
+                  {field.type === "select" && (
+                    <select
+                      name={field.id}
+                      value={(opportunity.custom as Record<string, any>)[field.id] || ""}
+                      onChange={handleCustomChange}
+                      className="w-full border rounded-md px-3 py-2"
+                    >
+                      <option value="">Select...</option>
+                      {(field.options || []).map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              ))}
+              <Button type="button" onClick={() => setEditing(false)}>Save</Button>
             </form>
           ) : (
             <div className="space-y-2">
               <div><span className="font-medium">Name:</span> {opportunity.name}</div>
               <div><span className="font-medium">Stage:</span> {opportunity.stage}</div>
-              <div><span className="font-medium">Value:</span> ₹{opportunity.value.toLocaleString()}</div>
+              <div><span className="font-medium">Value:</span> ₹{Number(opportunity.value).toLocaleString()}</div>
               <div><span className="font-medium">Owner:</span> {opportunity.owner}</div>
+              {/* Show custom fields */}
+              {customFields.map(field => (
+                <div key={field.id}><span className="font-medium">{field.label}:</span> {(opportunity.custom as Record<string, any>)[field.id] || ""}</div>
+              ))}
             </div>
           )}
 
